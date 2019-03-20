@@ -4,7 +4,7 @@ import numpy as np
 import os
 import collections
 import h5py
-from utils import data_load, plot_example
+from utils import data_load, plot_example, download_and_unzip
 from sklearn.metrics import confusion_matrix
 from keras.models import Sequential, Model, load_model
 from keras.initializers import Initializer, RandomNormal, RandomUniform
@@ -16,6 +16,9 @@ from keras.regularizers import l2
 
 cwd = os.getcwd()
 fontsPath = cwd+"/fonts"
+
+if not os.path.exists(fontsPath):
+	download_and_unzip()
 
 fonts = []
 for root, dirs, files in os.walk(fontsPath):

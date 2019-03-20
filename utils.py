@@ -1,3 +1,6 @@
+import zipfile
+import urllib.request
+import sys
 import random
 import pickle
 import matplotlib.pyplot as plt
@@ -8,6 +11,25 @@ import os
 
 FONTS_PATH = os.path.abspath('fonts')
 DICT_PATH = os.path.abspath('idx_to_label')
+filename = sys.argv[0]
+
+cwd = os.path.abspath(filename+"/..")
+
+def download_and_unzip():
+	#download file
+	download = "https://archive.ics.uci.edu/ml/machine-learning-databases/00417/fonts.zip"
+	print("Downloading Zip file into "+cwd+"/fonts.zip")
+	with urllib.request.urlopen( download ) as url:
+		#save
+		output = open(cwd+"/fonts.zip", "wb")
+		output.write(url.read())
+		output.close()
+
+	print("Unzipping file into folder "+cwd+"/fonts/")
+	#unzips
+	zip_ref = zipfile.ZipFile(cwd+"/fonts.zip", 'r')
+	zip_ref.extractall(cwd+"/fonts/")
+	zip_ref.close()
 
 def y_to_one_hot(Y, vec_size):
 	one_hot_vec = list()
