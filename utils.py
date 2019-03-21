@@ -76,11 +76,11 @@ def data_load(split=0.7, filenames=["AGENCY"]):
 
 	X = np.true_divide(X,255)
 
-	# next few commented lines print an example 
-	# rand = random.randint(1,len(data))
-	# print(rand)
-	# print(data.iloc[rand].font)
-	# print(Y[rand])
+	#next few commented lines print an example 
+	rand = random.randint(1,len(data))
+	print(rand)
+	print(data.iloc[rand].font)
+	print(Y[rand])
 
 	splitpoint = int(math.floor(len(X)*split))
 	X_train, X_test = X[:splitpoint], X[splitpoint:]

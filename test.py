@@ -13,6 +13,8 @@ from keras.layers.convolutional import Conv2D, MaxPooling2D
 from keras.optimizers import SGD, Adadelta, Adagrad
 from keras.constraints import maxnorm
 from keras.regularizers import l2
+from keras import backend as K
+print(K.tensorflow_backend._get_available_gpus())
 
 cwd = os.getcwd()
 fontsPath = cwd+"/fonts"
@@ -29,7 +31,9 @@ for root, dirs, files in os.walk(fontsPath):
 
 X_test,X_train,Y_test,Y_train,idx_to_label,label_to_idx = data_load(0.8,fonts)
 
+
 def get_model(X_train, Y_train, target_shape=153):
+	print(Y_train.shape)
 	model_name = "model_with_target_"+str(target_shape)+".h5"
 
 	if os.path.exists(model_name):
@@ -38,17 +42,17 @@ def get_model(X_train, Y_train, target_shape=153):
 	else:
 		X_input = Input(shape=(20,20,1,))
 
-		conv = Conv2D(32, (4, 4), activation='relu', padding='same', kernel_regularizer=l2(0.01))(X_input)
+		conv = Conv2D(64, (8, 8), activation='relu', padding='same', kernel_regularizer=l2(0.01))(X_input)
 
 		pool = MaxPooling2D(pool_size=(2, 2))(conv)
 
-		conv = Conv2D(64, (3, 3), activation='relu', padding='same', kernel_regularizer=l2(0.01))(X_input)
+		conv2 = Conv2D(128, (4, 4), activation='relu', padding='same', kernel_regularizer=l2(0.01))(pool)
 
-		pool = MaxPooling2D(pool_size=(2, 2))(conv)
+		pool2 = MaxPooling2D(pool_size=(2, 2))(conv2)
 
 		#dropout = Dropout(0.5)(pool)
 
-		flat = Flatten()(dropout)
+		flat = Flatten()(pool2)
 
 		dense1 = Dense(512, activation='relu', kernel_constraint=maxnorm(3), kernel_regularizer=l2(0.01))(flat)
 
@@ -58,15 +62,15 @@ def get_model(X_train, Y_train, target_shape=153):
 
 		model = Model(inputs=X_input, outputs=dense2)
 
-		#model.compile(loss = 'categorical_crossentropy', optimizer=Adagrad(lr=0.01, epsilon=None, decay=0.0), metrics=['accuracy'])
-		model.compile(loss = 'sparse_categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+		model.compile(loss = 'categorical_crossentropy', optimizer=Adagrad(lr=0.001, epsilon=None, decay=0.0000001), metrics=['accuracy'])
+		#model.compile(loss = 'categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 		
 		# Save the model
 		model.fit(X_train, Y_train, epochs=10, batch_size=32)
 		model.save(model_name)
 		return(model)
 
-
+print(len(idx_to_label))
 model = get_model(X_train, Y_train, len(idx_to_label))
 score = model.evaluate(X_test, Y_test)
 print("Test score: ", score[0])
